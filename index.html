@@ -160,6 +160,7 @@ function tr(str){
   const core=m[2].replace(/\s+/g,' ');if(!core)return str;
   let r=EN[core];
   if(r===undefined)for(const[re,rep]of ENP){if(re.test(core)){r=core.replace(re,rep);break}}
+  if(r===undefined){const mm=core.match(/^(.+?) : (.+ FCFA)$/);if(mm&&EN[mm[1]]!==undefined)r=EN[mm[1]]+': '+mm[2]}
   return r===undefined?str:m[1]+r+m[3];
 }
 {const _cf=window.confirm.bind(window),_pr=window.prompt.bind(window);window.confirm=m=>_cf(tr(m));window.prompt=(m,d)=>_pr(tr(m),d)}
@@ -545,7 +546,7 @@ R.application=()=>{
 };
 
 // ---------- Recherche ----------
-const STOP=new Set('le la les un une des de du d l et ou a au aux en dans sur pour par avec sans est sont que qui quoi comment quand je tu il elle nous vous ils me te se ce cet cette ces mon ma mes ton ta tes votre vos notre nos y pas ne plus c qu s j m t n on si ai as avez avons peut peux puis veux voudrais svp merci'.split(' '));
+const STOP=new Set('how do does did the of to is are am was were my me you your it its in on for and or can could would please with at by from this that there here what which who whom where when why i le la les un une des de du d l et ou a au aux en dans sur pour par avec sans est sont que qui quoi comment quand je tu il elle nous vous ils me te se ce cet cette ces mon ma mes ton ta tes votre vos notre nos y pas ne plus c qu s j m t n on si ai as avez avons peut peux puis veux voudrais svp merci'.split(' '));
 const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const toks=t=>norm(t).split(/[^a-z0-9]+/).filter(w=>w.length>1&&!STOP.has(w));
 const PAGES=[['accueil','Accueil','accueil annonces carrousel presentation'],['cours','Cours','cours pdf filiere niveau semestre annee academique documents audio video image'],['culture','Culture','livres romans videos educatives epreuves bibliotheque'],['projets','Projets','projet suivi feuille de route taches equipe'],['services','Produits et services','bureautique infographie programmation education patisserie telecom'],['abonnement','Abonnement','prix tarif mensuel trimestriel semestriel annuel mobile money orange mtn'],['candidature','Candidature','concours estlc repetition inscription formulaire'],['modalites','Modalités d’accès','modalites acces paiement etapes'],['apropos','À propos','presentation mission efx screen'],['contact','Contact','contact message email telephone'],['connexion','Se connecter','connexion inscription compte mot de passe']];
@@ -1215,7 +1216,7 @@ function calc(qs){
   if(m)return `√${m[1]} = <b>${fnum(Math.sqrt(+m[1].replace(',','.')))}</b>`;
   t=t.replace(/×/g,'*').replace(/(?<=\d)\s*x\s*(?=\d)/g,'*').replace(/\b(?:fois|times)\b/g,'*').replace(/÷|\bdivis[ée] par\b|\bdivided by\b/g,'/').replace(/\bplus\b/g,'+').replace(/\b(?:moins|minus)\b/g,'-').replace(/\^/g,'**').replace(/,/g,'.');
   if(!/^[\d\s+\-*/().]+$/.test(t)||!/\d\s*[-+*/]+\s*[\d(]/.test(t)||t.length>80)return null;
-  try{const r=Function('"use strict";return ('+t+')')();if(!isFinite(r))return null;return `${esc(qs.replace(/[?=]/g,'').trim())} = <b>${fnum(r)}</b>`}catch(e){return null}
+  try{const r=Function('"use strict";return ('+t+')')();if(!isFinite(r))return null;return `${esc(t.replace(/\*\*/g,'^').replace(/\*/g,' × ').replace(/\s+/g,' ').trim())} = <b>${fnum(r)}</b>`}catch(e){return null}
 }
 const UN={l:{km:1000,kilometre:1000,kilometres:1000,m:1,metre:1,metres:1,cm:.01,centimetre:.01,centimetres:.01,mm:.001,millimetre:.001,millimetres:.001,mile:1609.344,miles:1609.344,pied:.3048,pieds:.3048,pouce:.0254,pouces:.0254},
  w:{kg:1,kilo:1,kilos:1,kilogramme:1,kilogrammes:1,g:.001,gramme:.001,grammes:.001,t:1000,tonne:1000,tonnes:1000,lb:.45359237,livre:.45359237,livres:.45359237},
